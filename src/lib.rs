@@ -17,7 +17,9 @@ pub struct UtteranceConfig {
 	/// Whether to emit [`UtteranceEvent::SentenceBoundary`] events.
 	pub emit_sentence_boundary_events: bool,
 	/// Whether to emit [`UtteranceEvent::VisemesChunk`]/[`UtteranceEvent::BlendShapeVisemesChunk`] events.
-	pub emit_visemes: bool
+	pub emit_visemes: bool,
+	/// The name of the voice to use for synthesis.
+	pub voice: Option<Box<str>>
 }
 
 /// Common trait for a speech synthesiser.
