@@ -1,0 +1,15 @@
+[package]
+name = "speech-synthesis"
+version = "0.0.1"
+edition = "2021"
+rust-version = "1.56"
+authors = ["pyke.io <contact@pyke.io>"]
+description = "Common traits for speech synthesis"
+license = "Apache-2.0"
+repository = "https://github.com/pykeio/speech-synthesis"
+
+[dependencies]
+async-trait = "0.1"
+futures-core = { version = "0.3", default-features = false }
+anyhow = "1.0"
+ssml = { version = "=0.0.4", default-features = false }
