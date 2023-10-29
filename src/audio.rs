@@ -22,7 +22,7 @@ pub enum AudioChannels {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioContainer {
 	/// Containerless audio, only used with PCM, A-law, and mu-law encodings.
-	Raw,
+	Raw(AudioEncoding),
 	/// RIFF format, aka .WAV lossless audio.
 	Riff(AudioEncoding),
 	/// MP3 format audio.
