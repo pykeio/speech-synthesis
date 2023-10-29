@@ -2,7 +2,6 @@ use futures_core::Stream;
 
 /// Key & weight information for a single blend shape as part of a [`BlendShapeVisemeFrame`].
 #[derive(Debug, Clone)]
-#[non_exhaustive]
 pub struct BlendShape {
 	/// Blend shape key, typically as an [ARKit](https://developer.apple.com/documentation/arkit/arblendshapelocation?language=objc) blend shape.
 	pub key: Box<str>,
@@ -12,7 +11,6 @@ pub struct BlendShape {
 
 /// A single frame for visemes in blend shape format.
 #[derive(Debug, Clone)]
-#[non_exhaustive]
 pub struct BlendShapeVisemeFrame {
 	pub blendshapes: Box<[BlendShape]>,
 	/// Offset of this blendshape frame relative to the beginning of the audio stream.
@@ -28,7 +26,6 @@ pub struct BasicViseme(pub char);
 
 /// A single frame of 'basic' visemes.
 #[derive(Debug, Clone)]
-#[non_exhaustive]
 pub struct BasicVisemeFrame {
 	pub viseme: BasicViseme,
 	/// Offset of this viseme frame relative to the beginning of the audio stream.

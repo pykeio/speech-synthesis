@@ -10,7 +10,6 @@ pub use self::event::{BasicViseme, BasicVisemeFrame, BlendShape, BlendShapeVisem
 
 /// Configuration for a single speech synthesis utterance.
 #[derive(Debug, Default, Clone)]
-#[non_exhaustive]
 pub struct UtteranceConfig {
 	/// Whether to emit [`UtteranceEvent::WordBoundary`] events.
 	pub emit_word_boundary_events: bool,
