@@ -1,10 +1,12 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum AudioCodec {
 	Opus,
 	Vorbis
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum AudioEncoding {
 	Pcm,
 	ALaw,
@@ -12,6 +14,7 @@ pub enum AudioEncoding {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum AudioChannels {
 	/// Single channel (mono) audio.
 	Mono,
@@ -20,6 +23,7 @@ pub enum AudioChannels {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum AudioContainer {
 	/// Containerless audio, only used with PCM, A-law, and mu-law encodings.
 	Raw(AudioEncoding),
@@ -35,6 +39,7 @@ pub enum AudioContainer {
 
 /// Struct used for negotiating an audio format supported by both the application and the speech synthesiser.
 #[derive(Debug, Default, Clone)]
+#[non_exhaustive]
 pub struct AudioFormatPreference {
 	pub sample_rates: Option<Vec<u32>>,
 	pub channels: Option<Vec<AudioChannels>>,
