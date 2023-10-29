@@ -19,7 +19,9 @@ pub struct UtteranceConfig {
 	/// Whether to emit [`UtteranceEvent::VisemesChunk`]/[`UtteranceEvent::BlendShapeVisemesChunk`] events.
 	pub emit_visemes: bool,
 	/// The name of the voice to use for synthesis.
-	pub voice: Option<Box<str>>
+	pub voice: Option<Box<str>>,
+	/// The language to use for raw text synthesis.
+	pub language: Option<Box<str>>
 }
 
 /// Common trait for a speech synthesiser.
@@ -72,5 +74,23 @@ pub trait SpeechSynthesiser {
 		input: impl AsRef<str> + Send,
 		audio_format: &AudioFormat,
 		config: &UtteranceConfig
-	) -> crate::Result<Self::EventStream>;
+	) -> crate::Result<Self::EventStream> {
+		// default implementation, just pass the text in an SSML document
+		// text will be escaped by the `ssml` crate
+		self.synthesise_ssml_stream(
+			ssml::Speak::new(
+				config.voice.as_deref(),
+				[ssml::voice(
+					config
+						.voice
+						.as_ref()
+						.ok_or_else(|| anyhow::anyhow!("the default implementation of synthesise_text_stream requires a voice to be configured"))?,
+					[input.as_ref()]
+				)]
+			),
+			audio_format,
+			config
+		)
+		.await
+	}
 }
