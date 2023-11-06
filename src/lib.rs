@@ -1,6 +1,4 @@
 pub use ::ssml;
-// TODO: in the future see if we can remove the anyhow dependency without too much annoyance
-pub use anyhow::{Error, Result};
 pub use async_trait::async_trait;
 
 mod audio;
@@ -10,6 +8,7 @@ pub use self::event::{BasicViseme, BasicVisemeFrame, BlendShape, BlendShapeVisem
 
 /// Configuration for a single speech synthesis utterance.
 #[derive(Debug, Default, Clone)]
+#[non_exhaustive]
 pub struct UtteranceConfig {
 	/// Whether to emit [`UtteranceEvent::WordBoundary`] events.
 	pub emit_word_boundary_events: bool,
@@ -23,10 +22,49 @@ pub struct UtteranceConfig {
 	pub language: Option<Box<str>>
 }
 
+impl UtteranceConfig {
+	/// Configures whether to emit [`UtteranceEvent::WordBoundary`] events.
+	pub fn with_emit_word_boundary_events(mut self, x: bool) -> Self {
+		self.emit_word_boundary_events = x;
+		self
+	}
+
+	/// Configures whether to emit [`UtteranceEvent::SentenceBoundary`] events.
+	pub fn with_emit_sentence_boundary_events(mut self, x: bool) -> Self {
+		self.emit_sentence_boundary_events = x;
+		self
+	}
+
+	/// Configures whether to emit [`UtteranceEvent::VisemesChunk`]/[`UtteranceEvent::BlendShapeVisemesChunk`] events.
+	pub fn with_emit_visemes(mut self, x: bool) -> Self {
+		self.emit_visemes = x;
+		self
+	}
+
+	/// Configures the name of the voice to use for synthesis.
+	///
+	/// This is generally only used for [text synthesis](SpeechSynthesiser::synthesise_text_stream) and will be ignored
+	/// with [SSML synthesis](SpeechSynthesiser::synthesise_ssml_stream).
+	pub fn with_voice(mut self, x: impl Into<Box<str>>) -> Self {
+		self.voice = Some(x.into());
+		self
+	}
+
+	/// Configures the language to use for raw text synthesis.
+	///
+	/// This is generally only used for [text synthesis](SpeechSynthesiser::synthesise_text_stream) and will be ignored
+	/// with [SSML synthesis](SpeechSynthesiser::synthesise_ssml_stream).
+	pub fn with_language(mut self, x: impl Into<Box<str>>) -> Self {
+		self.language = Some(x.into());
+		self
+	}
+}
+
 /// Common trait for a speech synthesiser.
 #[async_trait]
 pub trait SpeechSynthesiser {
-	type EventStream: UtteranceEventStream;
+	type Error: std::error::Error + Send + Sync + 'static;
+	type EventStream: UtteranceEventStream<Self::Error>;
 
 	/// Negotiate an audio format supported by both the application and this synthesiser. The synthesiser returns `None`
 	/// if:
@@ -53,7 +91,7 @@ pub trait SpeechSynthesiser {
 	/// [`SpeechSynthesiser::negotiate_audio_format`].
 	///
 	/// You'll need to configure whether to receive events like visemes or boundaries with an [`UtteranceConfig`].
-	async fn synthesise_ssml_stream(&self, input: ssml::Speak, audio_format: &AudioFormat, config: &UtteranceConfig) -> crate::Result<Self::EventStream>;
+	async fn synthesise_ssml_stream(&self, input: ssml::Speak, audio_format: &AudioFormat, config: &UtteranceConfig) -> Result<Self::EventStream, Self::Error>;
 
 	/// Stream the synthesis of **raw text**.
 	///
@@ -73,19 +111,16 @@ pub trait SpeechSynthesiser {
 		input: impl AsRef<str> + Send,
 		audio_format: &AudioFormat,
 		config: &UtteranceConfig
-	) -> crate::Result<Self::EventStream> {
+	) -> Result<Self::EventStream, Self::Error> {
 		// default implementation, just pass the text in an SSML document
 		// text will be escaped by the `ssml` crate
 		self.synthesise_ssml_stream(
-			ssml::Speak::new(
+			ssml::Speak::new::<ssml::Element, _>(
 				config.voice.as_deref(),
-				[ssml::voice(
-					config
-						.voice
-						.as_ref()
-						.ok_or_else(|| anyhow::anyhow!("the default implementation of synthesise_text_stream requires a voice to be configured"))?,
-					[input.as_ref()]
-				)]
+				[match config.voice.as_ref() {
+					Some(voice) => ssml::voice(voice.as_ref(), [input.as_ref()]).into(),
+					None => input.as_ref().into()
+				}]
 			),
 			audio_format,
 			config

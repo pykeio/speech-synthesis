@@ -72,4 +72,4 @@ pub enum UtteranceEvent {
 /// A stream of [`UtteranceEvent`]s returned by the synthesiser.
 ///
 /// May be an [`Err`][Result::Err] if an error was encountered during synthesis (i.e. a socket disconnect).
-pub trait UtteranceEventStream: Stream<Item = crate::Result<UtteranceEvent>> + Send + Unpin {}
+pub trait UtteranceEventStream<E>: Stream<Item = Result<UtteranceEvent, E>> + Send + Unpin {}

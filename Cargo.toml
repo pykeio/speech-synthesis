@@ -11,5 +11,4 @@ repository = "https://github.com/pykeio/speech-synthesis"
 [dependencies]
 async-trait = "0.1"
 futures-core = { version = "0.3", default-features = false }
-anyhow = "1.0"
 ssml = { version = "=0.0.5", default-features = false }

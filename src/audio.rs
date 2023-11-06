@@ -39,6 +39,7 @@ pub enum AudioContainer {
 
 /// Struct used for negotiating an audio format supported by both the application and the speech synthesiser.
 #[derive(Debug, Default, Clone)]
+#[non_exhaustive]
 pub struct AudioFormatPreference {
 	pub sample_rates: Option<Vec<u32>>,
 	pub channels: Option<Vec<AudioChannels>>,
