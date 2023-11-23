@@ -1,6 +1,6 @@
 [package]
 name = "speech-synthesis"
-version = "0.0.4"
+version = "0.1.0"
 edition = "2021"
 rust-version = "1.56"
 authors = ["pyke.io <contact@pyke.io>"]
@@ -11,4 +11,4 @@ repository = "https://github.com/pykeio/speech-synthesis"
 [dependencies]
 async-trait = "0.1"
 futures-core = { version = "0.3", default-features = false }
-ssml = { version = "=0.0.5", default-features = false }
+ssml = { version = "0.1", default-features = false }
