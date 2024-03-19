@@ -1,5 +1,6 @@
+use core::future::Future;
+
 pub use ::ssml;
-pub use async_trait::async_trait;
 
 mod audio;
 pub use self::audio::{AudioChannels, AudioCodec, AudioContainer, AudioEncoding, AudioFormat, AudioFormatPreference};
@@ -61,10 +62,8 @@ impl UtteranceConfig {
 }
 
 /// Common trait for a speech synthesiser.
-#[async_trait]
 pub trait SpeechSynthesiser {
 	type Error: std::error::Error + Send + Sync + 'static;
-	type EventStream: UtteranceEventStream<Self::Error>;
 
 	/// Negotiate an audio format supported by both the application and this synthesiser. The synthesiser returns `None`
 	/// if:
@@ -91,7 +90,12 @@ pub trait SpeechSynthesiser {
 	/// [`SpeechSynthesiser::negotiate_audio_format`].
 	///
 	/// You'll need to configure whether to receive events like visemes or boundaries with an [`UtteranceConfig`].
-	async fn synthesise_ssml_stream(&self, input: ssml::Speak, audio_format: &AudioFormat, config: &UtteranceConfig) -> Result<Self::EventStream, Self::Error>;
+	fn synthesise_ssml_stream(
+		&self,
+		input: ssml::Speak,
+		audio_format: &AudioFormat,
+		config: &UtteranceConfig
+	) -> impl Future<Output = Result<impl UtteranceEventStream<Self::Error>, Self::Error>> + Send;
 
 	/// Stream the synthesis of **raw text**.
 	///
@@ -106,25 +110,10 @@ pub trait SpeechSynthesiser {
 	/// [`SpeechSynthesiser::negotiate_audio_format`].
 	///
 	/// You'll need to configure whether to receive events like visemes or boundaries with an [`UtteranceConfig`].
-	async fn synthesise_text_stream(
+	fn synthesise_text_stream(
 		&self,
 		input: impl AsRef<str> + Send,
 		audio_format: &AudioFormat,
 		config: &UtteranceConfig
-	) -> Result<Self::EventStream, Self::Error> {
-		// default implementation, just pass the text in an SSML document
-		// text will be escaped by the `ssml` crate
-		self.synthesise_ssml_stream(
-			ssml::Speak::new::<ssml::Element, _>(
-				config.voice.as_deref(),
-				[match config.voice.as_ref() {
-					Some(voice) => ssml::voice(voice.as_ref(), [input.as_ref()]).into(),
-					None => input.as_ref().into()
-				}]
-			),
-			audio_format,
-			config
-		)
-		.await
-	}
+	) -> impl Future<Output = Result<impl UtteranceEventStream<Self::Error>, Self::Error>> + Send;
 }
