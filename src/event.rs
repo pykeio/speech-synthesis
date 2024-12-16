@@ -36,7 +36,7 @@ pub struct BasicVisemeFrame {
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum UtteranceEvent {
-	/// Marks the audio offset of an SSML `<mark />`.
+	/// Marks the audio offset of an [`ssml::Mark`].
 	SsmlMark {
 		/// The position in milliseconds the mark occurred, relative to the beginning of the audio stream.
 		at_millis: f32,

@@ -83,7 +83,6 @@ impl AudioFormatPreference {
 
 #[derive(Debug, Clone)]
 pub struct AudioFormat {
-	name: Option<Box<str>>,
 	sample_rate: u32,
 	channels: AudioChannels,
 	bitrate: Option<u16>,
@@ -93,26 +92,11 @@ pub struct AudioFormat {
 impl AudioFormat {
 	pub fn new(sample_rate: u32, channels: AudioChannels, bitrate: Option<u16>, container: AudioContainer) -> Self {
 		AudioFormat {
-			name: None,
 			sample_rate,
 			channels,
 			bitrate,
 			container
 		}
-	}
-
-	pub fn new_named(name: impl Into<Box<str>>, sample_rate: u32, channels: AudioChannels, bitrate: Option<u16>, container: AudioContainer) -> Self {
-		AudioFormat {
-			name: Some(name.into()),
-			sample_rate,
-			channels,
-			bitrate,
-			container
-		}
-	}
-
-	pub fn name(&self) -> Option<&str> {
-		self.name.as_deref()
 	}
 
 	pub fn sample_rate(&self) -> u32 {
