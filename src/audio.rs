@@ -8,8 +8,13 @@ pub enum AudioCodec {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum AudioEncoding {
-	Pcm,
+	/// Signed 16-bit PCM encoding.
+	PcmI16,
+	/// 32-bit floating point PCM encoding.
+	PcmF32,
+	/// 8-bit A-law encoding.
 	ALaw,
+	/// 8-bit μ-law encoding.
 	MuLaw
 }
 
