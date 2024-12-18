@@ -81,7 +81,7 @@ pub trait SpeechSynthesiser {
 	/// - requesting OGG format should return `None`,
 	/// - and requesting 44100 Hz stereo MP3 at 160 Kbps should return an audio format of 44100 Hz stereo MP3 **at 192
 	///   Kbps**.
-	fn negotiate_audio_format(&self, pref: AudioFormatPreference) -> Option<AudioFormat>;
+	fn negotiate_audio_format(&self, pref: &AudioFormatPreference) -> Option<AudioFormat>;
 
 	/// Stream the synthesis of an [`ssml`] document.
 	///
@@ -92,10 +92,10 @@ pub trait SpeechSynthesiser {
 	/// You'll need to configure whether to receive events like visemes or boundaries with an [`UtteranceConfig`].
 	fn synthesise_ssml_stream(
 		&self,
-		input: ssml::Speak,
+		input: &ssml::Speak<'_>,
 		audio_format: &AudioFormat,
 		config: &UtteranceConfig
-	) -> impl Future<Output = Result<impl UtteranceEventStream<Self::Error>, Self::Error>> + Send;
+	) -> impl Future<Output = Result<impl UtteranceEventStream<Self::Error> + 'static, Self::Error>> + Send;
 
 	/// Stream the synthesis of **raw text**.
 	///
@@ -112,8 +112,8 @@ pub trait SpeechSynthesiser {
 	/// You'll need to configure whether to receive events like visemes or boundaries with an [`UtteranceConfig`].
 	fn synthesise_text_stream(
 		&self,
-		input: impl AsRef<str> + Send,
+		input: &str,
 		audio_format: &AudioFormat,
 		config: &UtteranceConfig
-	) -> impl Future<Output = Result<impl UtteranceEventStream<Self::Error>, Self::Error>> + Send;
+	) -> impl Future<Output = Result<impl UtteranceEventStream<Self::Error> + 'static, Self::Error>> + Send;
 }
